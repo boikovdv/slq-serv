@@ -81,13 +81,15 @@ export class Server {
 
     }
     async _handler(req, res) {
+        let headHost = req.headers[':authority'] || req.headers['host'];
+        let { host } = headHost?.match(/^(?<host>[\w-.]+)(:(?<port>\d+))?/).groups || {};
         let { path, query } = req.url.match(/(?<path>[^?]*)(?:\?(?<query>.*))?/).groups || {};
         /** @type {object}
          * @property {object} params
          * @property {function(RequestContext)} handler
          * @property {object} store
          **/
-        let route = this.router.find(req.method, path);
+        let route = this.router.find(req.method, path, { host });
         if (route?.handler) {
             let context = new RequestContext({
                 req,
