@@ -1,11 +1,11 @@
 {
   "name": "@slq/serv",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Web server",
   "author": "Dmitry Boikov",
   "license": "MIT",
   "dependencies": {
-    "find-my-way": "^3.0.5"
+    "find-my-way": "^4.1.0"
   },
   "main": "./index.js",
   "type": "module"

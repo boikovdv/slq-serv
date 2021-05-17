@@ -72,8 +72,6 @@ export class RequestContext {
 export class Server {
     middlewares = {};
     constructor(opts) {
-        const {useDomain} = opts || {};
-        this.useDomain = useDomain;
         this.router = Router({
             // defaultRoute : defaultHandler,//it'll be called when no route matches. If it is not set the we'll set statusCode to 404
             ignoreTrailingSlash: true,
@@ -83,15 +81,12 @@ export class Server {
 
     }
     async _handler(req, res) {
-        let headHost = req.headers[':authority'] || req.headers['host'];
-        let { host } = this.useDomain && headHost?.match(/^(?<host>[\w-.]+)(:(?<port>\d+))?/).groups || {};
-        let { path, query } = req.url.match(/(?<path>[^?]*)(?:\?(?<query>.*))?/).groups || {};
         /** @type {object}
          * @property {object} params
          * @property {function(RequestContext)} handler
          * @property {object} store
          **/
-        let route = this.router.find(req.method, ( host ? '/' + host : '' ) + path);
+        let route = this.router.find(req.method, path);
         if (route?.handler) {
             let context = new RequestContext({
                 req,
