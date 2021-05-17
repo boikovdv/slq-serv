@@ -81,6 +81,7 @@ export class Server {
 
     }
     async _handler(req, res) {
+        let { path, query } = req.url.match(/(?<path>[^?]*)(?:\?(?<query>.*))?/).groups || {};
         /** @type {object}
          * @property {object} params
          * @property {function(RequestContext)} handler
