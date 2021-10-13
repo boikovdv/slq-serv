@@ -71,6 +71,11 @@ export class RequestContext {
 // noinspection ExceptionCaughtLocallyJS
 export class Server {
     middlewares = {};
+    _hooks = {
+        before: [],
+        after: [],
+        error: []
+    };
     constructor(opts) {
         this.router = Router({
             // defaultRoute : defaultHandler,//it'll be called when no route matches. If it is not set the we'll set statusCode to 404
@@ -100,6 +105,11 @@ export class Server {
                 store: route.store.extra
             });
             try {
+                // hooks "before"
+                for (let hBefore of this._hooks.before) {
+                    await hBefore(context);
+                }
+                // middlewares
                 if (route.store?.middleware) {
                     for (let mw of route.store.middleware) {
                         let result;
@@ -112,8 +122,16 @@ export class Server {
                             return;
                     }
                 }
-                route.handler(context);
+                await route.handler(context);
+                // hooks "after"
+                for (let hAfter of this._hooks.after) {
+                    await hAfter(context);
+                }
             } catch (e) {
+                // hooks "error"
+                for (let hError of this._hooks.error) {
+                    await hError(context, e);
+                }
                 console.log('MW return',e)
             }
         } else {
@@ -129,6 +147,15 @@ export class Server {
      */
     registerMiddleware(name,func) {
         this.middlewares[name] = func;
+    }
+
+    /**
+     * Register named hook on all requests
+     * @param {Function} func
+     * @param {string} when?
+     */
+    registerHook(func,when = 'after') {
+        this._hooks[when].push(func);
     }
 
     /**
