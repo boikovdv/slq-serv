@@ -132,7 +132,9 @@ export class Server {
                 for (let hError of this._hooks.error) {
                     await hError(context, e);
                 }
-                console.log('MW return',e)
+                console.log(e);
+                res.statusCode = 500;
+                res.end();
             }
         } else {
             res.statusCode = 404;
