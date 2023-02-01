@@ -33,6 +33,11 @@ export class RequestContext {
         return this;
     }
 
+    message(m) {
+        this.res.statusMessage = m;
+        return this;
+    }
+
     headers(obj) {
         Object.keys(obj).forEach(k => {
             this.res.setHeader(k, obj[k]);
@@ -44,14 +49,14 @@ export class RequestContext {
         if (end === undefined) end = true;
 
         if (data instanceof Readable) {
-            data.once('data',()=>{if (!this.res.headersSent) this.res.writeHead(this.res.statusCode);});
+            data.once('data',()=>{if (!this.res.headersSent) this.res.writeHead(this.res.statusCode, this.res.statusMessage);});
             data.pipe(this.res, {end});
         } else if (typeof data == 'string' || data instanceof Buffer) {
-            if (!this.res.headersSent) this.res.writeHead(this.res.statusCode);
+            if (!this.res.headersSent) this.res.writeHead(this.res.statusCode, this.res.statusMessage);
             this.res.write(data);
             if (end) this.res.end();
         } else {
-            if (!this.res.headersSent) this.res.writeHead(this.res.statusCode, {"Content-Type": "application/json; charset=utf-8"});
+            if (!this.res.headersSent) this.res.writeHead(this.res.statusCode, this.res.statusMessage, {"Content-Type": "application/json; charset=utf-8"});
             this.res.write(JSON.stringify(data));
             if (end) this.res.end();
         }
@@ -62,8 +67,9 @@ export class RequestContext {
         this.res.setHeader('Content-Type', t);
         return this;
     }
+
     end(d) {
-        if (!this.res.headersSent) this.res.writeHead(this.res.statusCode);
+        if (!this.res.headersSent) this.res.writeHead(this.res.statusCode, this.res.statusMessage);
         this.res.end(d);
     }
 }
