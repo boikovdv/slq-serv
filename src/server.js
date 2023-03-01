@@ -56,7 +56,7 @@ export class RequestContext {
             this.res.write(data);
             if (end) this.res.end();
         } else {
-            if (!this.res.headersSent) this.res.writeHead(this.res.statusCode, this.res.statusMessage, {"Content-Type": "application/json; charset=utf-8"});
+            if (!this.res.headersSent) this.res.writeHead(this.res.statusCode, this.res.statusMessage || '', {"Content-Type": "application/json; charset=utf-8"});
             this.res.write(JSON.stringify(data));
             if (end) this.res.end();
         }
